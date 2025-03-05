@@ -135,10 +135,46 @@ public class MenuDialogs(IProjectService projectService, ICustomerService custom
         }
     }
 
-    private void UpdateOption()
+    private async void UpdateOption()
     {
 
+        //Metod till stor del skriven med hjälp av chatGPT. 
+        Console.Clear();
+        Console.WriteLine("Vänligen ange titeln för det projekt du vill uppdatera:");
+        string title = Console.ReadLine()!;
+
+        var project = await _projectService.GetProjectByNameAsync(title);
+
+        if (project == null)
+        {
+            Console.WriteLine("Projektet finns inte.");
+            return;
+        }
+
+        Console.WriteLine($"Titel: {project.Title}, Beskrivning: {project.Description}, Startdatum: {project.StartDate}, Slutdatum: {project.EndDate}");
+
+        Console.WriteLine("Skriv ny titel (eller tryck Enter för att behålla):");
+        string newTitle = Console.ReadLine()!;
+        if (!string.IsNullOrWhiteSpace(newTitle)) project.Title = newTitle;
+
+        Console.WriteLine("Skriv ny beskrivning (eller tryck Enter för att behålla):");
+        string newDescription = Console.ReadLine()!;
+        if (!string.IsNullOrWhiteSpace(newDescription)) project.Description = newDescription;
+
+        Console.WriteLine("Skriv nytt startdatum (yyyy-MM-dd) (eller tryck Enter för att behålla):");
+        string startDateInput = Console.ReadLine()!;
+        if (DateTime.TryParse(startDateInput, out DateTime newStartDate)) project.StartDate = newStartDate;
+
+        Console.WriteLine("Skriv nytt slutdatum (yyyy-MM-dd) (eller tryck Enter för att behålla):");
+        string endDateInput = Console.ReadLine()!;
+        if (DateTime.TryParse(endDateInput, out DateTime newEndDate)) project.EndDate = newEndDate;
+
+
+        bool result = await _projectService.UpdateProjectsAsync(Project);
+
+        Console.WriteLine(result ? "Projektet har uppdaterats." : "Projektet kunde inte uppdateras.");
     }
+
 
     private void DeleteOption()
     {
